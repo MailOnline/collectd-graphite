@@ -1,5 +1,4 @@
-FROM lopter/raring-base:latest
-MAINTAINER Louis Opter <louis@dotcloud.com>
+FROM ubuntu
 
 RUN apt-get update && apt-get install -y python-cairo collectd libgcrypt11 python-virtualenv supervisor sudo build-essential python-dev openssh-server openssh-client && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 RUN mkdir /var/run/sshd
@@ -24,6 +23,4 @@ RUN sed -i "s#^\(SECRET_KEY = \).*#\1\"`python -c 'import os; import base64; pri
 RUN sudo -u graphite HOME=/opt/graphite PYTHONPATH=/opt/graphite/lib/ /bin/sh -c "cd ~/webapp/graphite && ~/env/bin/python manage.py syncdb --noinput"
 RUN sudo -u graphite HOME=/opt/graphite PYTHONPATH=/opt/graphite/lib/ /bin/sh -c "cd ~/webapp/graphite && ~/env/bin/python mkadmin.py"
 
-# sshd, gunicorn, collectd, carbon/plaintext, carbon/pickle, carbon/amqp
-EXPOSE 22 8080 25826/udp 2003 2004 7002
 CMD exec supervisord -n
