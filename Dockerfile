@@ -1,12 +1,9 @@
 FROM ubuntu
 
-RUN apt-get update && apt-get install -y python-cairo collectd libgcrypt11 python-virtualenv supervisor sudo build-essential python-dev openssh-server openssh-client && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
-RUN mkdir /var/run/sshd
-# I wish we could feed a key to use, but this is not possible (yet?)
-#RUN mkdir -pm 700 /root/.ssh/ && ssh-keygen -f /root/.ssh/authorized_keys.priv -N "" && mv /root/.ssh/authorized_keys.priv.pub /root/.ssh/authorized_keys
+RUN apt-get update && apt-get install -y python-cairo collectd libgcrypt11 python-virtualenv supervisor sudo build-essential python-dev && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
 RUN adduser --system --group --no-create-home collectd && adduser --system --home /opt/graphite graphite
-# Use --system-site-packages so it get access to pycairo (which cannot be installed via pip)
+
 RUN sudo -u graphite virtualenv --system-site-packages ~graphite/env
 ADD graphite/requirements.txt /opt/graphite/
 RUN sudo -u graphite HOME=/opt/graphite /bin/sh -c ". ~/env/bin/activate && pip install -r /opt/graphite/requirements.txt"
